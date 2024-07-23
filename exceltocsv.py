@@ -1,9 +1,13 @@
 import streamlit as st
 import pandas as pd
 
-def convert_excel_to_csv(uploaded_file):
+def process_excel(uploaded_file, bank_option):
     # Lee el archivo Excel
     df = pd.read_excel(uploaded_file)
+    
+    if bank_option == "Banco Pacífico":
+        # Elimina la primera fila y las tres primeras columnas
+        df = df.iloc[1:, 3:]
     
     # Convierte el DataFrame a CSV
     csv = df.to_csv(index=False)
@@ -13,13 +17,16 @@ def convert_excel_to_csv(uploaded_file):
 def main():
     st.title("Convertidor de XLS a CSV")
 
+    # Desplegable para seleccionar el banco
+    bank_option = st.selectbox("Selecciona el banco", ["Banco Pacífico", "Otro Banco"])
+
     uploaded_file = st.file_uploader("Selecciona un archivo XLS", type=["xls", "xlsx"])
 
     if uploaded_file is not None:
         st.success("Archivo subido con éxito!")
         
-        # Convierte el archivo Excel a CSV
-        csv = convert_excel_to_csv(uploaded_file)
+        # Procesa el archivo Excel según la opción del banco
+        csv = process_excel(uploaded_file, bank_option)
         
         # Muestra el contenido del archivo CSV
         st.text_area("Contenido del archivo CSV", csv, height=300)
