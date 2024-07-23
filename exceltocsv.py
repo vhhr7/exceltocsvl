@@ -3,14 +3,17 @@ import pandas as pd
 
 def process_excel(uploaded_file, bank_option):
     # Lee el archivo Excel
-    df = pd.read_excel(uploaded_file)
+    df = pd.read_excel(uploaded_file, header=None)  # No usar la primera fila como encabezado inicialmente
     
     if bank_option == "Banco Pacífico":
         # Elimina la primera fila y las tres primeras columnas
-        df = df.iloc[2:, 3:]
+        df = df.iloc[1:, 3:]
+    
+    # Renombrar las columnas para eliminar cualquier "Unnamed"
+    df.columns = range(df.shape[1])
     
     # Convierte el DataFrame a CSV
-    csv = df.to_csv(index=False)
+    csv = df.to_csv(index=False, header=False)  # No incluir el encabezado en el CSV
     
     return csv
 
