@@ -7,7 +7,7 @@ def process_excel(uploaded_file, bank_option):
     
     if bank_option == "Banco Pacífico":
         # Elimina la primera fila y las tres primeras columnas
-        df = df.iloc[1:, 3:]
+        df = df.iloc[0:, 3:]
     
     # Convierte el DataFrame a CSV
     csv = df.to_csv(index=False)
