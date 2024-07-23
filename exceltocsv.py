@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 
 def process_excel(uploaded_file, bank_option):
-    # Lee el archivo Excel
-    df = pd.read_excel(uploaded_file, header=None)  # No usar la primera fila como encabezado inicialmente
+    # Lee el archivo Excel sin encabezado
+    df = pd.read_excel(uploaded_file, header=None)  
     
     if bank_option == "Banco Pacífico":
         # Elimina la primera fila y las tres primeras columnas
@@ -12,8 +12,11 @@ def process_excel(uploaded_file, bank_option):
     # Renombrar las columnas para eliminar cualquier "Unnamed"
     df.columns = range(df.shape[1])
     
-    # Convierte el DataFrame a CSV
-    csv = df.to_csv(index=False, header=False)  # No incluir el encabezado en el CSV
+    # Eliminar filas vacías
+    df.dropna(how='all', inplace=True)
+    
+    # Convierte el DataFrame a CSV sin incluir el encabezado
+    csv = df.to_csv(index=False, header=False)
     
     return csv
 
