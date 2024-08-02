@@ -1,6 +1,19 @@
 import streamlit as st
 import pandas as pd
 
+# Añadir el código de seguimiento de Google Analytics
+st.markdown("""
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P0B9JCSYFW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-P0B9JCSYFW');
+    </script>
+    """, unsafe_allow_html=True)
+
 def process_excel(uploaded_file, bank_option):
     # Lee el archivo Excel sin encabezado
     df = pd.read_excel(uploaded_file, header=None)  
