@@ -29,8 +29,10 @@ def process_excel(uploaded_file, bank_option):
         df.dropna(subset=["DOCUMENTO"], inplace=True)  # Eliminar filas con NaN en la columna "DOCUMENTO"
         df.drop(df.index[0], inplace=True)  # Eliminar la primera fila restante (índice 0)
         
-        # Agregar la fila de encabezado al principio del DataFrame
-        header_df = pd.DataFrame([header_row])
+        # Crear un DataFrame con la fila de encabezado
+        header_df = pd.DataFrame([header_row], columns=df.columns)
+        
+        # Concatenar la fila de encabezado con los datos originales
         df = pd.concat([header_df, df], ignore_index=True)
     else:
         df = pd.read_excel(uploaded_file, header=None)  # Leer el archivo por defecto
