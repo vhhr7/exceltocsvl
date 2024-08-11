@@ -25,14 +25,14 @@ def process_excel(uploaded_file, bank_option):
         df = pd.read_excel(uploaded_file, header=None)
         
         # Mantener la fila 7 y las filas a partir de la 10
-        df_fila_7 = df.iloc[[6]]  # Fila 7 (índice 6 en pandas)
+        #df_fila_7 = df.iloc[[6]]  # Fila 7 (índice 6 en pandas)
         df_restante = df.iloc[9:]  # Filas a partir de la 10 (índice 9 en pandas)
         
         # Combinar la fila 7 con las filas a partir de la 10
-        df = pd.concat([df_fila_7, df_restante]).reset_index(drop=True)
+        #df = pd.concat([df_fila_7, df_restante]).reset_index(drop=True)
         
         # Eliminar cualquier fila que solo contenga valores numéricos
-        df = df[~df.apply(lambda row: row.astype(str).str.isnumeric().all(), axis=1)]
+        #df = df[~df.apply(lambda row: row.astype(str).str.isnumeric().all(), axis=1)]
         
         # Eliminar filas con NaN en la columna correspondiente a "DOCUMENTO"
         df.dropna(subset=[df.columns[1]], inplace=True)  # Supone que la columna "DOCUMENTO" es la segunda columna
