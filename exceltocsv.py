@@ -22,21 +22,21 @@ def process_excel(uploaded_file, bank_option):
         df = df.iloc[1:, 3:]  # Elimina la primera fila y las tres primeras columnas
     elif bank_option == "Banco Diners Club":
         # Fila de encabezado que deseas agregar
-        header_row = ["Date", "DOCUMENTO", "Payee", "Notes", "CUOTA", "Payment", "Deposit", "SALDO DIFERIDO (USD)"]
+        header_row = ["FECHA", "DOCUMENTO", "DESCRIPCION", "OPERACION", "CUOTA", "VALOR (USD)", "SALDO DIFERIDO (USD)", "DEPOSITO"]
         
         # Lee el archivo Excel con encabezado y aplica las transformaciones específicas para Diners Club
         df = pd.read_excel(uploaded_file, skiprows=6)  # Saltar las primeras 6 filas
         df.dropna(subset=["DOCUMENTO"], inplace=True)  # Eliminar filas con NaN en la columna "DOCUMENTO"
         
-        # Crear un DataFrame con la fila de encabezado
-        header_df = pd.DataFrame([header_row], columns=header_row)
+        # Agregar la columna "DEPOSITO" vacía
+        df["DEPOSITO"] = ""
         
-        # Concatenar la fila de encabezado con los datos originales
-        df = pd.concat([header_df, df], ignore_index=True)
+        # Procesar la columna "VALOR (USD)" para mover valores entre paréntesis a la nueva columna "DEPOSITO"
+        df["DEPOSITO"] = df["VALOR (USD)"].apply(lambda x: x.strip('()') if pd.notna(x) and x.startswith('(') and x.endswith(')') else '')
+        df["VALOR (USD)"] = df["VALOR (USD)"].apply(lambda x: '' if pd.notna(x) and x.startswith('(') and x.endswith(')') else x)
         
-        # Mover valores entre paréntesis a la columna "Deposit" y remover los paréntesis de "Payment"
-        df["Deposit"] = df["Payment"].apply(lambda x: abs(x) if isinstance(x, (int, float)) and x < 0 else "")
-        df["Payment"] = df["Payment"].apply(lambda x: x if isinstance(x, (int, float)) and x >= 0 else "")
+        # Renombrar las columnas con los encabezados correctos
+        df.columns = header_row
     else:
         df = pd.read_excel(uploaded_file, header=None)  # Leer el archivo por defecto
     
@@ -44,7 +44,7 @@ def process_excel(uploaded_file, bank_option):
     df.dropna(how='all', inplace=True)
     
     # Convierte el DataFrame a CSV sin incluir el encabezado
-    csv = df.to_csv(index=False, header=False)
+    csv = df.to_csv(index=False, header=True)  # Asegúrate de incluir el encabezado en el CSV
     
     return csv
 
