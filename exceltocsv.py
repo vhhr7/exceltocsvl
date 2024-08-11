@@ -23,19 +23,21 @@ def process_excel(uploaded_file, bank_option):
     elif bank_option == "Banco Diners Club Tarjeta Diners":
         # Lee el archivo Excel con encabezado y aplica las transformaciones específicas para Diners Club
         df = pd.read_excel(uploaded_file, skiprows=6)  # Saltar las primeras 6 filas
+        
+        # Mantener la fila que contiene los encabezados "FECHA", "DOCUMENTO", "DESCRIPCION"
+        header_row_index = df.index[df['DOCUMENTO'] == 'DOCUMENTO'].tolist()[0]
+        df = df.loc[header_row_index:].reset_index(drop=True)
+        
         df.dropna(subset=["DOCUMENTO"], inplace=True)  # Eliminar filas con NaN en la columna "DOCUMENTO"
-        df.drop(df.index[0], inplace=True)  # Eliminar la primera fila restante (índice 0)
+        df.reset_index(drop=True, inplace=True)
     else:
         df = pd.read_excel(uploaded_file, header=None)  # Leer el archivo por defecto
 
-    # Renombrar las columnas para eliminar cualquier "Unnamed"
-    df.columns = range(df.shape[1])
-    
     # Eliminar filas vacías
     df.dropna(how='all', inplace=True)
     
     # Convierte el DataFrame a CSV sin incluir el encabezado
-    csv = df.to_csv(index=False, header=False)
+    csv = df.to_csv(index=False, header=True if bank_option == "Banco Diners Club Tarjeta Diners" else False)
     
     return csv
 
