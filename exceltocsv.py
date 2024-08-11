@@ -20,7 +20,7 @@ def process_excel(uploaded_file, bank_option):
         # Lee el archivo Excel sin encabezado y aplica las transformaciones específicas para Banco Pacífico
         df = pd.read_excel(uploaded_file, header=None)  
         df = df.iloc[1:, 3:]  # Elimina la primera fila y las tres primeras columnas
-    elif bank_option == "Banco Diners Club Tarjeta Diners":
+    elif bank_option == "Banco Diners Club":
         # Fila de encabezado que deseas agregar
         header_row = ["FECHA", "DOCUMENTO", "DESCRIPCION", "OPERACION", "CUOTA", "VALOR (USD)", "SALDO DIFERIDO (USD)"]
         
