@@ -29,7 +29,13 @@ def process_excel(uploaded_file, bank_option):
         df_restante = df.iloc[9:]  # Filas a partir de la 10 (índice 9 en pandas)
         
         # Combinar la fila 7 con las filas a partir de la 10
-        df = pd.concat([df_fila_7, df_restante]).reset_index(drop=True)
+        df = pd.concat([df_fila_7, df_restante])
+        
+        # Eliminar la fila con índices de 0, 1, 2 si aparece
+        if all(df.iloc[0].str.isnumeric()):
+            df = df.drop(df.index[0])
+        
+        df.reset_index(drop=True, inplace=True)
         
         # Eliminar filas con NaN en la columna correspondiente a "DOCUMENTO"
         df.dropna(subset=[df.columns[1]], inplace=True)  # Supone que la columna "DOCUMENTO" es la segunda columna
