@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import openpyxl
 
 # Añadir el código de seguimiento de Google Analytics
 st.markdown("""
@@ -15,13 +16,18 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 def process_excel(uploaded_file, bank_option):
-    # Lee el archivo Excel sin encabezado
-    df = pd.read_excel(uploaded_file, header=None)  
-    
     if bank_option == "Banco Pacífico":
-        # Elimina la primera fila y las tres primeras columnas
-        df = df.iloc[1:, 3:]
-    
+        # Lee el archivo Excel sin encabezado y aplica las transformaciones específicas para Banco Pacífico
+        df = pd.read_excel(uploaded_file, header=None)  
+        df = df.iloc[1:, 3:]  # Elimina la primera fila y las tres primeras columnas
+    elif bank_option == "Banco Diners Club Tarjeta Diners":
+        # Lee el archivo Excel con encabezado y aplica las transformaciones específicas para Diners Club
+        df = pd.read_excel(uploaded_file, skiprows=6)  # Saltar las primeras 6 filas
+        df.dropna(subset=["DOCUMENTO"], inplace=True)  # Eliminar filas con NaN en la columna "DOCUMENTO"
+        df.drop(df.index[0], inplace=True)  # Eliminar la primera fila restante (índice 0)
+    else:
+        df = pd.read_excel(uploaded_file, header=None)  # Leer el archivo por defecto
+
     # Renombrar las columnas para eliminar cualquier "Unnamed"
     df.columns = range(df.shape[1])
     
@@ -37,7 +43,7 @@ def main():
     st.title("Convertidor de XLS a CSV")
 
     # Desplegable para seleccionar el banco
-    bank_option = st.selectbox("Selecciona el banco", ["Banco Pacífico", "Otro Banco"])
+    bank_option = st.selectbox("Selecciona el banco", ["Banco Pacífico", "Banco Diners Club Tarjeta Diners", "Otro Banco"])
 
     uploaded_file = st.file_uploader("Selecciona un archivo XLS", type=["xls", "xlsx"])
 
