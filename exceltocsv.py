@@ -16,30 +16,26 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 def process_excel(uploaded_file, bank_option):
-    df = pd.read_excel(uploaded_file, header=None)
-    
     if bank_option == "Banco Pacífico":
+        # Lee el archivo Excel sin encabezado y aplica las transformaciones específicas para Banco Pacífico
+        df = pd.read_excel(uploaded_file, header=None)  
         df = df.iloc[1:, 3:]  # Elimina la primera fila y las tres primeras columnas
-    
-    if bank_option == "Banco Diners Club Tarjeta Diners":
-        # Mantener la fila 7 y las filas a partir de la 10
-        df_fila_7 = df.iloc[[6]]  # Fila 7 (índice 6 en pandas)
-        df_restante = df.iloc[9:]  # Filas a partir de la 10 (índice 9 en pandas)
-        
-        # Combinar la fila 7 con las filas a partir de la 10
-        df = pd.concat([df_fila_7, df_restante]).reset_index(drop=True)
-        
-        # Eliminar cualquier fila que solo contenga valores numéricos
-        df = df[~df.apply(lambda row: row.astype(str).str.isnumeric().all(), axis=1)]
-        
-        # Eliminar filas con NaN en la columna correspondiente a "DOCUMENTO"
-        df.dropna(subset=[df.columns[1]], inplace=True)  # Supone que la columna "DOCUMENTO" es la segunda columna
+    elif bank_option == "Banco Diners Club Tarjeta Diners":
+        # Lee el archivo Excel con encabezado y aplica las transformaciones específicas para Diners Club
+        df = pd.read_excel(uploaded_file, skiprows=6)  # Saltar las primeras 6 filas
+        df.dropna(subset=["DOCUMENTO"], inplace=True)  # Eliminar filas con NaN en la columna "DOCUMENTO"
+        df.drop(df.index[0], inplace=True)  # Eliminar la primera fila restante (índice 0)
+    else:
+        df = pd.read_excel(uploaded_file, header=None)  # Leer el archivo por defecto
+
+    # Renombrar las columnas para eliminar cualquier "Unnamed"
+    df.columns = range(df.shape[1])
     
     # Eliminar filas vacías
     df.dropna(how='all', inplace=True)
     
     # Convierte el DataFrame a CSV sin incluir el encabezado
-    csv = df.to_csv(index=False, header=True if bank_option == "Banco Diners Club Tarjeta Diners" else False)
+    csv = df.to_csv(index=False, header=False)
     
     return csv
 
@@ -57,17 +53,16 @@ def main():
         # Procesa el archivo Excel según la opción del banco
         csv = process_excel(uploaded_file, bank_option)
         
-        if csv is not None:
-            # Muestra el contenido del archivo CSV
-            st.text_area("Contenido del archivo CSV", csv, height=300)
+        # Muestra el contenido del archivo CSV
+        st.text_area("Contenido del archivo CSV", csv, height=300)
 
-            # Botón para descargar el archivo CSV
-            st.download_button(
-                label="Descargar archivo CSV",
-                data=csv,
-                file_name="archivo_convertido.csv",
-                mime="text/csv"
-            )
+        # Botón para descargar el archivo CSV
+        st.download_button(
+            label="Descargar archivo CSV",
+            data=csv,
+            file_name="archivo_convertido.csv",
+            mime="text/csv"
+        )
 
     # Pie de página
     display_footer()
