@@ -21,15 +21,19 @@ def process_excel(uploaded_file, bank_option):
         df = pd.read_excel(uploaded_file, header=None)  
         df = df.iloc[1:, 3:]  # Elimina la primera fila y las tres primeras columnas
     elif bank_option == "Banco Diners Club Tarjeta Diners":
+        # Fila de encabezado que deseas agregar
+        header_row = ["FECHA", "DOCUMENTO", "DESCRIPCION", "OPERACION", "CUOTA", "VALOR (USD)", "SALDO DIFERIDO (USD)"]
+        
         # Lee el archivo Excel con encabezado y aplica las transformaciones específicas para Diners Club
         df = pd.read_excel(uploaded_file, skiprows=6)  # Saltar las primeras 6 filas
         df.dropna(subset=["DOCUMENTO"], inplace=True)  # Eliminar filas con NaN en la columna "DOCUMENTO"
         df.drop(df.index[0], inplace=True)  # Eliminar la primera fila restante (índice 0)
+        
+        # Agregar la fila de encabezado al principio del DataFrame
+        header_df = pd.DataFrame([header_row])
+        df = pd.concat([header_df, df], ignore_index=True)
     else:
         df = pd.read_excel(uploaded_file, header=None)  # Leer el archivo por defecto
-
-    # Renombrar las columnas para eliminar cualquier "Unnamed"
-    df.columns = range(df.shape[1])
     
     # Eliminar filas vacías
     df.dropna(how='all', inplace=True)
