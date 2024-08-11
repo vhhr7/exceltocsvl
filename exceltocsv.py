@@ -27,7 +27,7 @@ def process_excel(uploaded_file, bank_option):
         # Lee el archivo Excel con encabezado y aplica las transformaciones específicas para Diners Club
         df = pd.read_excel(uploaded_file, skiprows=6)  # Saltar las primeras 6 filas
         df.dropna(subset=["DOCUMENTO"], inplace=True)  # Eliminar filas con NaN en la columna "DOCUMENTO"
-        df.drop(df.index[0], inplace=True)  # Eliminar la primera fila restante (índice 0)
+        #df.drop(df.index[0], inplace=True)  # Eliminar la primera fila restante (índice 0)
         
         # Crear un DataFrame con la fila de encabezado
         header_df = pd.DataFrame([header_row], columns=df.columns)
