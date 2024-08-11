@@ -21,16 +21,8 @@ def process_excel(uploaded_file, bank_option):
         df = pd.read_excel(uploaded_file, header=None)  
         df = df.iloc[1:, 3:]  # Elimina la primera fila y las tres primeras columnas
     elif bank_option == "Banco Diners Club Tarjeta Diners":
-        # Lee el archivo Excel con encabezado y aplica las transformaciones específicas para Diners Club
-        df = pd.read_excel(uploaded_file, skiprows=6)  # Saltar las primeras 6 filas
-        
-        # Buscar la fila que contiene "DOCUMENTO" y usarla como encabezado
-        try:
-            header_row_index = df.index[df['DOCUMENTO'] == 'DOCUMENTO'].tolist()[0]
-            df = df.loc[header_row_index:].reset_index(drop=True)
-        except IndexError:
-            st.error("No se encontró la fila con 'DOCUMENTO'. Verifica el archivo y vuelve a intentarlo.")
-            return None
+        # Lee el archivo Excel con encabezado y selecciona las filas a partir de la fila 7
+        df = pd.read_excel(uploaded_file, skiprows=6)  # Saltar las primeras 6 filas (mantener desde la fila 7)
         
         # Eliminar filas con NaN en la columna "DOCUMENTO"
         df.dropna(subset=["DOCUMENTO"], inplace=True)
