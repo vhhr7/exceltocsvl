@@ -21,12 +21,18 @@ def process_excel(uploaded_file, bank_option):
         df = pd.read_excel(uploaded_file, header=None)  
         df = df.iloc[1:, 3:]  # Elimina la primera fila y las tres primeras columnas
     elif bank_option == "Banco Diners Club Tarjeta Diners":
-        # Lee el archivo Excel con encabezado y selecciona las filas a partir de la fila 7
-        df = pd.read_excel(uploaded_file, skiprows=6)  # Saltar las primeras 6 filas (mantener desde la fila 7)
+        # Lee el archivo Excel y selecciona las filas a partir de la fila 10, pero incluyendo la fila 7
+        df = pd.read_excel(uploaded_file, header=None)
         
-        # Eliminar filas con NaN en la columna "DOCUMENTO"
-        df.dropna(subset=["DOCUMENTO"], inplace=True)
-        df.reset_index(drop=True, inplace=True)
+        # Mantener la fila 7 y las filas a partir de la 10
+        df_fila_7 = df.iloc[[6]]  # Fila 7 (índice 6 en pandas)
+        df_restante = df.iloc[9:]  # Filas a partir de la 10 (índice 9 en pandas)
+        
+        # Combinar la fila 7 con las filas a partir de la 10
+        df = pd.concat([df_fila_7, df_restante]).reset_index(drop=True)
+        
+        # Eliminar filas con NaN en la columna correspondiente a "DOCUMENTO"
+        df.dropna(subset=[df.columns[1]], inplace=True)  # Supone que la columna "DOCUMENTO" es la segunda columna
     else:
         df = pd.read_excel(uploaded_file, header=None)  # Leer el archivo por defecto
 
