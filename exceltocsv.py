@@ -24,11 +24,16 @@ def process_excel(uploaded_file, bank_option):
         # Lee el archivo Excel con encabezado y aplica las transformaciones específicas para Diners Club
         df = pd.read_excel(uploaded_file, skiprows=6)  # Saltar las primeras 6 filas
         
-        # Mantener la fila que contiene los encabezados "FECHA", "DOCUMENTO", "DESCRIPCION"
-        header_row_index = df.index[df['DOCUMENTO'] == 'DOCUMENTO'].tolist()[0]
-        df = df.loc[header_row_index:].reset_index(drop=True)
+        # Buscar la fila que contiene "DOCUMENTO" y usarla como encabezado
+        try:
+            header_row_index = df.index[df['DOCUMENTO'] == 'DOCUMENTO'].tolist()[0]
+            df = df.loc[header_row_index:].reset_index(drop=True)
+        except IndexError:
+            st.error("No se encontró la fila con 'DOCUMENTO'. Verifica el archivo y vuelve a intentarlo.")
+            return None
         
-        df.dropna(subset=["DOCUMENTO"], inplace=True)  # Eliminar filas con NaN en la columna "DOCUMENTO"
+        # Eliminar filas con NaN en la columna "DOCUMENTO"
+        df.dropna(subset=["DOCUMENTO"], inplace=True)
         df.reset_index(drop=True, inplace=True)
     else:
         df = pd.read_excel(uploaded_file, header=None)  # Leer el archivo por defecto
@@ -55,16 +60,17 @@ def main():
         # Procesa el archivo Excel según la opción del banco
         csv = process_excel(uploaded_file, bank_option)
         
-        # Muestra el contenido del archivo CSV
-        st.text_area("Contenido del archivo CSV", csv, height=300)
+        if csv is not None:
+            # Muestra el contenido del archivo CSV
+            st.text_area("Contenido del archivo CSV", csv, height=300)
 
-        # Botón para descargar el archivo CSV
-        st.download_button(
-            label="Descargar archivo CSV",
-            data=csv,
-            file_name="archivo_convertido.csv",
-            mime="text/csv"
-        )
+            # Botón para descargar el archivo CSV
+            st.download_button(
+                label="Descargar archivo CSV",
+                data=csv,
+                file_name="archivo_convertido.csv",
+                mime="text/csv"
+            )
 
     # Pie de página
     display_footer()
