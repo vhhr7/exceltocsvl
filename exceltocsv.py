@@ -31,8 +31,8 @@ def process_excel(uploaded_file, bank_option):
         # Combinar la fila 7 con las filas a partir de la 10
         df = pd.concat([df_fila_7, df_restante]).reset_index(drop=True)
         
-        # Eliminar la primera fila después del proceso
-        df = df.drop(df.index[1])
+        # Eliminar cualquier fila que solo contenga valores numéricos
+        df = df[~df.apply(lambda row: row.astype(str).str.isnumeric().all(), axis=1)]
         
         # Eliminar filas con NaN en la columna correspondiente a "DOCUMENTO"
         df.dropna(subset=[df.columns[1]], inplace=True)  # Supone que la columna "DOCUMENTO" es la segunda columna
