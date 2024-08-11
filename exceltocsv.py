@@ -49,7 +49,7 @@ def main():
     st.title("Convertidor de XLS a CSV")
 
     # Desplegable para seleccionar el banco
-    bank_option = st.selectbox("Selecciona el banco", ["Banco Pacífico", "Banco Diners Club Tarjeta Diners", "Otro Banco"])
+    bank_option = st.selectbox("Selecciona el banco", ["Banco Pacífico", "Banco Diners Club", "Otro Banco"])
 
     uploaded_file = st.file_uploader("Selecciona un archivo XLS", type=["xls", "xlsx"])
 
