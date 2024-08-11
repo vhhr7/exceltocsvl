@@ -27,13 +27,18 @@ def process_excel(uploaded_file, bank_option):
         # Lee el archivo Excel con encabezado y aplica las transformaciones específicas para Diners Club
         df = pd.read_excel(uploaded_file, skiprows=6)  # Saltar las primeras 6 filas
         df.dropna(subset=["DOCUMENTO"], inplace=True)  # Eliminar filas con NaN en la columna "DOCUMENTO"
-        #df.drop(df.index[0], inplace=True)  # Eliminar la primera fila restante (índice 0)
+        df.drop(df.index[0], inplace=True)  # Eliminar la primera fila restante (índice 0)
         
         # Crear un DataFrame con la fila de encabezado
         header_df = pd.DataFrame([header_row], columns=df.columns)
         
         # Concatenar la fila de encabezado con los datos originales
         df = pd.concat([header_df, df], ignore_index=True)
+        
+        # Procesar la columna "VALOR (USD)" para mover valores entre paréntesis a la nueva columna "Depositado"
+        df["Depositado"] = df["VALOR (USD)"].apply(lambda x: x.strip('()') if pd.notna(x) and x.startswith('(') and x.endswith(')') else '')
+        df["VALOR (USD)"] = df["VALOR (USD)"].apply(lambda x: '' if pd.notna(x) and x.startswith('(') and x.endswith(')') else x)
+
     else:
         df = pd.read_excel(uploaded_file, header=None)  # Leer el archivo por defecto
     
