@@ -37,6 +37,9 @@ def process_excel(uploaded_file, bank_option):
         
         # Renombrar las columnas con los encabezados correctos
         df.columns = header_row
+    elif bank_option == "Banco Pichincha":
+        # Solo convierte el archivo de Excel a CSV sin realizar transformaciones adicionales
+        df = pd.read_excel(uploaded_file)
     else:
         df = pd.read_excel(uploaded_file, header=None)  # Leer el archivo por defecto
     
@@ -52,7 +55,7 @@ def main():
     st.title("Convertidor de XLS a CSV")
 
     # Desplegable para seleccionar el banco
-    bank_option = st.selectbox("Selecciona el banco", ["Banco Pacífico", "Banco Diners Club", "Otro Banco"])
+    bank_option = st.selectbox("Selecciona el banco", ["Banco Pacífico", "Banco Diners Club", "Banco Pichincha", "Otro Banco"])
 
     uploaded_file = st.file_uploader("Selecciona un archivo XLS", type=["xls", "xlsx"])
 
@@ -108,7 +111,7 @@ def display_footer():
         <div class="separator"></div>
         <div>
             <p>Developed by Vic Herrera | <a href="https://vicherrera.net" target="_blank">Vic Herrera</a> | <a href="https://datawava.com" target="_blank">datawava</a></p>
-            <p>© Version 1.2  - July, 2024</p>
+            <p>© Version 1.3  - Agosto, 2024</p>
         </div>
     </div>
     """
